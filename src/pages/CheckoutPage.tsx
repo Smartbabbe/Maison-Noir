@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTheme } from '../context/ThemeContext'
 import { useCart } from '../context/CartContext'
+import { usePaystackPayment } from 'react-paystack'
 
 interface CheckoutPageProps {
   onNavigate: (page: string) => void
@@ -22,9 +23,41 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
+  const paystackConfig = {
+    reference: new Date().getTime().toString(),
+    email: form.email,
+    amount: Math.round(total * 100),
+    publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+  }
+
+  const initializePayment = usePaystackPayment(paystackConfig)
+
+  const handlePaystackSuccess = async (reference: any) => {
+    try {
+      const res = await fetch('/api/verify-transaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference: reference.reference }),
+      })
+      const data = await res.json()
+      if (data.status === true) {
+        setOrderPlaced(true)
+        setIsOpen(false)
+      } else {
+        alert('Payment could not be verified. Please try again or contact support.')
+      }
+    } catch (err) {
+      alert('Something went wrong verifying your payment.')
+    }
+  }
+
   const handlePlaceOrder = () => {
-    setOrderPlaced(true)
-    setIsOpen(false)
+    initializePayment({
+      onSuccess: handlePaystackSuccess,
+      onClose: () => {
+        console.log('Payment popup closed')
+      },
+    })
   }
 
   if (orderPlaced) {
@@ -138,37 +171,16 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
               </div>
             )}
 
-            {/* Step 2 — Payment */}
+
+                        {/* Step 2 — Payment */}
             {step === 2 && (
               <div>
                 <h2 className={`font-display text-2xl font-light mb-6 ${dark ? 'text-noir-50' : 'text-noir-900'}`}>
-                  Payment Details
+                  Payment
                 </h2>
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { name: 'cardName', label: 'Name on Card', col: 2 },
-                    { name: 'cardNumber', label: 'Card Number', col: 2 },
-                    { name: 'expiry', label: 'Expiry Date (MM/YY)', col: 1 },
-                    { name: 'cvv', label: 'CVV', col: 1 },
-                  ].map(field => (
-                    <div key={field.name} className={field.col === 2 ? 'col-span-2' : ''}>
-                      <label className={`block font-body text-xs tracking-widest uppercase mb-2 ${dark ? 'text-noir-400' : 'text-noir-500'}`}>
-                        {field.label}
-                      </label>
-                      <input
-                        type="text"
-                        name={field.name}
-                        value={form[field.name as keyof typeof form]}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 font-body text-sm border focus:outline-none focus:border-gold transition-colors ${
-                          dark
-                            ? 'bg-noir-800 border-white/10 text-noir-100 placeholder-noir-600'
-                            : 'bg-white border-black/10 text-noir-900 placeholder-noir-400'
-                        }`}
-                      />
-                    </div>
-                  ))}
-                </div>
+                <p className={`font-body text-sm leading-relaxed mb-8 ${dark ? 'text-noir-400' : 'text-noir-500'}`}>
+                  You'll securely enter your card details via Paystack in the final step. Your card information is never stored or processed by Maison Noir directly.
+                </p>
                 <div className="flex gap-4 mt-8">
                   <button
                     onClick={() => setStep(1)}
@@ -208,10 +220,9 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                 <div className={`p-6 mb-8 border ${dark ? 'border-white/10' : 'border-black/10'}`}>
                   <div className="flex items-center justify-between mb-3">
                     <p className={`font-body text-xs tracking-widest uppercase ${dark ? 'text-noir-400' : 'text-noir-500'}`}>Payment</p>
-                    <button onClick={() => setStep(2)} className="font-body text-xs text-gold hover:text-gold-light">Edit</button>
                   </div>
                   <p className={`font-body text-sm ${dark ? 'text-noir-200' : 'text-noir-700'}`}>
-                    Card ending in {form.cardNumber.slice(-4) || '····'}
+                    Paid securely via Paystack
                   </p>
                 </div>
 
