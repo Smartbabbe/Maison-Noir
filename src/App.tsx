@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage'
 import CollectionPage from './pages/CollectionPage'
 import AboutPage from './pages/AboutPage'
 import CheckoutPage from './pages/CheckoutPage'
+import TrackOrderPage from './pages/TrackOrderPage'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home')
@@ -25,6 +26,7 @@ export default function App() {
 
           {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}
           {currentPage === 'checkout' && <CheckoutPage onNavigate={handleNavigate} />}
+                    {currentPage === 'track-order' && <TrackOrderPage onNavigate={handleNavigate} />}
           {currentPage === 'collection' && <CollectionPage />}
           {currentPage === 'about' && <AboutPage onNavigate={handleNavigate} />}
         </div>

@@ -58,6 +58,18 @@ export default function Navbar({ onNavigate, currentPage }: NavProps) {
               {item}
             </button>
           ))}
+          <button
+            onClick={() => onNavigate("track-order")}
+            className={`font-body text-xs tracking-widest uppercase transition-colors ${
+              currentPage === "track-order"
+                ? "text-gold"
+                : dark
+                  ? "text-noir-100 hover:text-white"
+                  : "text-noir-700 hover:text-noir-900"
+            }`}
+          >
+            Track Order
+          </button>
         </nav>
 
         {/* Actions */}
@@ -195,6 +207,15 @@ export default function Navbar({ onNavigate, currentPage }: NavProps) {
                 {item}
               </button>
             ))}
+            <button
+              onClick={() => {
+                onNavigate("track-order");
+                setMenuOpen(false);
+              }}
+              className={`text-left font-body text-sm tracking-widest uppercase ${dark ? "text-noir-200" : "text-noir-700"}`}
+            >
+              Track Order
+            </button>
           </div>
         </div>
       )}

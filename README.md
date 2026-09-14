@@ -14,7 +14,7 @@ Maison Noir is a single-product e-commerce UI built to
 replicate the feel of a premium fashion brand storefront. 
 The focus was on clean visual design, smooth interactions, 
 and a complete purchase flow from product browsing to 
-order confirmation.
+order confirmation, to checkout using paystack payment gateway.
 
 ---
 
@@ -27,6 +27,7 @@ order confirmation.
 - **Quantity controls** — increment/decrement with live price updates
 - **Checkout flow** — order summary and confirmation screen
 - **Fully responsive** — mobile, tablet, and desktop
+- **Payment gateway** — paystack payment gateway integrated
 
 ---
 
@@ -58,7 +59,7 @@ npm run dev
 - Tailwind transition utilities for the slide-in 
   cart drawer animation
 - Mobile-first responsive layout
-
+- Paystack payment gateway
 ---
 
 ## Contact
